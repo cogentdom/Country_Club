@@ -35,8 +35,12 @@ exploring the data, and getting acquainted with the 3 tables. */
 /* Q1: Some of the facilities charge a fee to members, but some do not.
 Write a SQL query to produce a list of the names of the facilities that do. */
 
+Select name From Facilities Where membercost > 0; 
+
 
 /* Q2: How many facilities do not charge a fee to members? */
+
+Select count(Distinct facid) From Facilities Where membercost = 0;
 
 
 /* Q3: Write an SQL query to show a list of facilities that charge a fee to members,
@@ -44,9 +48,14 @@ where the fee is less than 20% of the facility's monthly maintenance cost.
 Return the facid, facility name, member cost, and monthly maintenance of the
 facilities in question. */
 
+Select facid, name, membercost, monthlymaintenance 
+From Facilities Where membercost < (monthlymaintenance * 0.2);
 
-/* Q4: Write an SQL query to retrieve the details of facilities with ID 1 and 5.
+
+/* Q4: Write a SQL query to retrieve the details of facilities with ID 1 and 5.
 Try writing the query without using the OR operator. */
+
+Select * From Facilities Where facid In (1,5);
 
 
 /* Q5: Produce a list of facilities, with each labelled as
@@ -54,15 +63,35 @@ Try writing the query without using the OR operator. */
 more than $100. Return the name and monthly maintenance of the facilities
 in question. */
 
+Select name, monthlymaintenance,
+Case When monthlymaintenance > 100 Then 'expensive'
+Else 'cheap' End As quality
+From Facilities;
+
+
 
 /* Q6: You'd like to get the first and last name of the last member(s)
 who signed up. Try not to use the LIMIT clause for your solution. */
 
+Select firstname, surname 
+From Members 
+Where joindate = 
+		(Select max(joindate) From Members); 
 
 /* Q7: Produce a list of all members who have used a tennis court.
 Include in your output the name of the court, and the name of the member
 formatted as a single column. Ensure no duplicate data, and order by
 the member name. */
+
+Select concat(firstname, ' || ', court) as log
+From Members
+Right Join
+	(Select Distinct b.memid as id, f.name as court, f.facid as fid
+	From Bookings As b
+	Left Join Facilities As f Using (facid)
+	Where f.name Like '%ennis__ourt%' And b.memid != 0) As sub
+On memid = id
+Order By firstname, court;
 
 
 /* Q8: Produce a list of bookings on the day of 2012-09-14 which
@@ -73,8 +102,20 @@ facility, the name of the member formatted as a single column, and the cost.
 Order by descending cost, and do not use any subqueries. */
 
 
+
+
 /* Q9: This time, produce the same result as in Q8, but using a subquery. */
 
+
+Select sub.name, sub2.firstname, sub.cost 
+From Bookings as b
+Inner Join 
+	(Select facid, name, guestcost as cost From Facilities Where guestcost > 30) As sub
+Using (facid)
+Inner Join
+	(Select firstname, memid From Members Where memid!=0) As sub2
+Using (memid)
+Where Date(starttime) = '2012-09-14';
 
 /* PART 2: SQLite
 
