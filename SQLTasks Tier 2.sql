@@ -101,12 +101,6 @@ the guest user's ID is always 0. Include in your output the name of the
 facility, the name of the member formatted as a single column, and the cost.
 Order by descending cost, and do not use any subqueries. */
 
-
-
-
-/* Q9: This time, produce the same result as in Q8, but using a subquery. */
-
-
 Select sub.name, sub2.firstname, sub.cost 
 From Bookings as b
 Inner Join 
@@ -116,6 +110,12 @@ Inner Join
 	(Select firstname, memid From Members Where memid!=0) As sub2
 Using (memid)
 Where Date(starttime) = '2012-09-14';
+
+
+/* Q9: This time, produce the same result as in Q8, but using a subquery. */
+
+
+
 
 /* PART 2: SQLite
 
