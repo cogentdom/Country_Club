@@ -101,15 +101,20 @@ the guest user's ID is always 0. Include in your output the name of the
 facility, the name of the member formatted as a single column, and the cost.
 Order by descending cost, and do not use any subqueries. */
 
-Select sub.name, sub2.firstname, sub.cost 
-From Bookings as b
-Inner Join 
-	(Select facid, name, guestcost as cost From Facilities Where guestcost > 30) As sub
-Using (facid)
+Select name, fullname, 
+	Case When memid != 0 Then slots * membercost
+	Else slots * guestcost End As slotcost 
+From Facilities as f 
 Inner Join
-	(Select firstname, memid From Members Where memid!=0) As sub2
+	(Select slots, bookid, memid, facid, starttime 
+     From Bookings Where Date(starttime) = '2012-09-14') as b
+Using (facid)
+Inner Join 
+	(Select concat(firstname, ' ', surname) as fullname, memid 
+     From Members) as m
 Using (memid)
-Where Date(starttime) = '2012-09-14';
+Having slotcost > 30
+Order By slotcost Desc;
 
 
 /* Q9: This time, produce the same result as in Q8, but using a subquery. */
