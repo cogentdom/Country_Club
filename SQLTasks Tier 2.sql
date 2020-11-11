@@ -134,6 +134,19 @@ The output of facility name and total revenue, sorted by revenue. Remember
 that there's a different cost for guests and members! */
 
 
+-- Select name, 
+-- 	Case When memid != 0 Then Sum(slots * membercost)
+-- 	Else Sum(slots * guestcost) End As total_revenue 
+-- From Facilities as f 
+-- Inner Join
+-- 	(Select slots, bookid, memid, facid, starttime 
+--      From Bookings) as b
+-- Using (facid)
+-- Group By name
+-- Having total_revenue < 1000
+-- Order By total_revenue
+
+
 
 /* Q11: Produce a report of members and who recommended them in alphabetic surname,firstname order */
 
