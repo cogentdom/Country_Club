@@ -150,7 +150,13 @@ that there's a different cost for guests and members! */
 
 /* Q11: Produce a report of members and who recommended them in alphabetic surname,firstname order */
 
-
+-- SELECT surname, firstname, recommended_by
+-- FROM Members as m
+-- Left Join 
+-- 	(Select concat(surname, firstname) as recommended_by, memid 
+--      From Members) as sub
+-- On m.recommendedby = sub.memid
+-- Order By surname, firstname
 
 
 /* Q12: Find the facilities with their usage by member, but not guests */
