@@ -134,35 +134,48 @@ The output of facility name and total revenue, sorted by revenue. Remember
 that there's a different cost for guests and members! */
 
 
--- Select name, 
--- 	Case When memid != 0 Then Sum(slots * membercost)
--- 	Else Sum(slots * guestcost) End As total_revenue 
--- From Facilities as f 
--- Inner Join
--- 	(Select slots, bookid, memid, facid, starttime 
---      From Bookings) as b
--- Using (facid)
--- Group By name
--- Having total_revenue < 1000
--- Order By total_revenue
+Select name, 
+	Case When memid != 0 Then Sum(slots * membercost)
+	Else Sum(slots * guestcost) End As total_revenue 
+From Facilities as f 
+Inner Join
+	(Select slots, bookid, memid, facid, starttime 
+     From Bookings) as b
+Using (facid)
+Group By name
+Having total_revenue < 1000
+Order By total_revenue;
 
 
 
 /* Q11: Produce a report of members and who recommended them in alphabetic surname,firstname order */
 
--- SELECT surname, firstname, recommended_by
--- FROM Members as m
--- Left Join 
--- 	(Select concat(surname, firstname) as recommended_by, memid 
---      From Members) as sub
--- On m.recommendedby = sub.memid
--- Order By surname, firstname
+SELECT surname, firstname, recommended_by
+FROM Members as m
+Left Join 
+	(Select concat(surname, firstname) as recommended_by, memid 
+     From Members) as sub
+On m.recommendedby = sub.memid
+Order By surname, firstname;
 
 
 /* Q12: Find the facilities with their usage by member, but not guests */
 
-
+Select f.name as facility_name, m.name as member_name, Sum(slots)*0.5 as hours_used 
+From Bookings
+Left Join (Select concat(surname, ' ', firstname) as name, memid From Members) as m
+Using (memid)
+Left Join (Select name, facid From Facilities) as f
+Using (facid)
+Where memid != 0
+Group By facid, memid;
 
 
 /* Q13: Find the facilities usage by month, but not guests */
 
+Select DATE(starttime), name, Sum(slots)*0.5 as hours_used 
+From Bookings
+Left Join (Select name, facid From Facilities) as f
+Using (facid)
+Where memid != 0
+Group By name, MONTH(starttime);
